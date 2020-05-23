@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iomanip>
 
-const std::string Simulation::directory = ".\\Results\\";
+const std::string Simulation::directory = "../results/";
 const std::string Simulation::resultsFileName = "simulation_results";
 const std::string Simulation::averageFileName = "simulation_results_averaged";
 const std::string Simulation::extension = ".txt";

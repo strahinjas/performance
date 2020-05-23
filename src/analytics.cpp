@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <armadillo>
 
-const std::string Analytics::directory = ".\\Results\\";
+const std::string Analytics::directory = "../results/";
 const std::string Analytics::demandsFileName = "analytical_demands";
 const std::string Analytics::resultsFileName = "analytical_results";
 const std::string Analytics::extension = ".txt";
