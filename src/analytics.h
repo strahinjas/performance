@@ -14,8 +14,6 @@ public:
 
 	void gordonNewell();
 	void buzen(uint64_t n);
-
-	friend class Simulation;
 private:
 	arma::mat convertToArmaMatrix(const matrix& matrix) const;
 
