@@ -45,6 +45,7 @@ void Simulation::simulate(uint64_t n, double simulationTime)
 		for (double& u : U[i]) u /= iterations;
 		for (double& x : X[i]) x /= iterations;
 		for (double& nsr : Nsr[i]) nsr /= iterations;
+		for (double& r : R[i]) r /= iterations;
 
 		T[i] /= iterations;
 	}
