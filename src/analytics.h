@@ -14,6 +14,8 @@ public:
 
 	void gordonNewell();
 	void buzen(uint64_t n);
+
+	friend class Simulation;
 private:
 	arma::mat convertToArmaMatrix(const matrix& matrix) const;
 
@@ -33,6 +35,7 @@ private:
 	std::vector<std::vector<double>> U;
 	std::vector<std::vector<double>> X;
 	std::vector<std::vector<double>> Nsr;
+	std::vector<std::vector<double>> R;
 	std::vector<double> T;
 };
 

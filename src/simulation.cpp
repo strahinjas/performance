@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iomanip>
 
-const std::string Simulation::directory = "../results/";
+const std::string Simulation::directory = ".\\Results\\";
 const std::string Simulation::resultsFileName = "simulation_results";
 const std::string Simulation::averageFileName = "simulation_results_averaged";
 const std::string Simulation::extension = ".txt";
@@ -16,7 +16,7 @@ const std::unordered_map<uint64_t, uint64_t> Simulation::cycles = { { 10, 10 }, 
 void Simulation::simulate(uint64_t n, double simulationTime)
 {
 	U.clear();   X.clear();
-	Nsr.clear(); T.clear();
+	Nsr.clear(); R.clear();  T.clear();
 
 	for (uint64_t i = 0; i < system.K.size(); i++)
 	{
@@ -171,9 +171,13 @@ void Simulation::calculateParameters(bool accumulate, uint64_t index, double sim
 	{
 		for (uint64_t i = 0; i < servers.size(); i++)
 		{
+			double x = servers[i].tasksProcessed * 1000.0 / simulationTime;
+			double nsr = ((double) serverTaskCount[i]) / runCount;
+
 			U[index][i] += servers[i].workTime / simulationTime;
-			X[index][i] += servers[i].tasksProcessed * 1000.0 / simulationTime;
-			Nsr[index][i] += ((double) serverTaskCount[i]) / runCount;
+			X[index][i] += x;
+			Nsr[index][i] += nsr;
+			R[index][i] += nsr * 1000.0 / x;
 		}
 
 		T[index] += cumulativeResponseTime / (taskCount * 1000.0);
@@ -183,17 +187,20 @@ void Simulation::calculateParameters(bool accumulate, uint64_t index, double sim
 		std::vector<double> u;
 		std::vector<double> x;
 		std::vector<double> nsr;
+		std::vector<double> r;
 
 		for (uint64_t i = 0; i < servers.size(); i++)
 		{
 			u.push_back(servers[i].workTime / simulationTime);
 			x.push_back(servers[i].tasksProcessed * 1000.0 / simulationTime);
 			nsr.push_back(((double) serverTaskCount[i]) / runCount);
+			r.push_back(nsr[nsr.size() - 1] * 1000.0 / x[x.size() - 1]);
 		}
 
 		U.push_back(u);
 		X.push_back(x);
 		Nsr.push_back(nsr);
+		R.push_back(r);
 
 		T.push_back(cumulativeResponseTime / (taskCount * 1000.0));
 	}
@@ -205,15 +212,16 @@ void Simulation::writeResultsFile(const std::string& fileName) const
 
 	for (uint64_t i = 0; i < U.size(); i++)
 	{
-		output << "###############################" << std::endl;
-		output << "############ K = " << system.K[i] << " ############" << std::endl;
-		output << "###############################" << std::endl << std::endl;
+		output << "###############################################" << std::endl;
+		output << "#################### K = " << system.K[i] << " ####################" << std::endl;
+		output << "###############################################" << std::endl << std::endl;
 
 		output << std::left
 			   << std::setw(10) << "Server"
 			   << std::setw(10) << "U"
-			   << std::setw(10) << "X"
-			   << std::setw(10) << "Nsr";
+			   << std::setw(10) << "X [1/s]"
+			   << std::setw(10) << "Nsr"
+			   << std::setw(10) << "R [ms]";
 
 		output << std::endl;
 
@@ -223,19 +231,20 @@ void Simulation::writeResultsFile(const std::string& fileName) const
 				   << std::setw(10) << j
 				   << std::setw(10) << U[i][j]
 				   << std::setw(10) << X[i][j]
-				   << std::setw(10) << Nsr[i][j];
+				   << std::setw(10) << Nsr[i][j]
+				   << std::setw(10) << R[i][j];
 
 			output << std::endl;
 		}
 
 		output << std::endl;
 
-		output << "T = " << T[i] << std::endl;
+		output << "T = " << T[i] << "s" << std::endl;
 
 		output << std::endl;
 	}
 
-	output << "###############################";
+	output << "###############################################";
 
 	output.close();
 }

@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <armadillo>
 
-const std::string Analytics::directory = "../results/";
+const std::string Analytics::directory = ".\\Results\\";
 const std::string Analytics::demandsFileName = "analytical_demands";
 const std::string Analytics::resultsFileName = "analytical_results";
 const std::string Analytics::extension = ".txt";
@@ -50,8 +50,8 @@ void Analytics::buzen(uint64_t n)
 {
 	// reset system data
 
-	G.clear(); U.clear();
-	X.clear(); Nsr.clear(); T.clear();
+	G.clear();   U.clear(); X.clear();
+	Nsr.clear(); R.clear(); T.clear();
 
 	for (uint64_t i = 0; i < demands.size(); i++)
 	{
@@ -83,9 +83,11 @@ void Analytics::buzen(uint64_t n)
 		U.push_back(u);
 		X.push_back(x);
 
-		// calculate average task count per server
+		// calculate average task count per server and
+		// server's response time
 
 		std::vector<double> averages;
+		std::vector<double> responses;
 
 		for (uint64_t j = 0; j < demands[i].size(); j++)
 		{
@@ -99,9 +101,11 @@ void Analytics::buzen(uint64_t n)
 			}
 
 			averages.push_back(count);
+			responses.push_back(count * 1000.0 / x[j]);
 		}
 
 		Nsr.push_back(averages);
+		R.push_back(responses);
 
 		// calculate system response time
 		// using Little's formula
@@ -132,9 +136,9 @@ void Analytics::writeDemandsFile() const
 
 	for (uint64_t i = 0; i < demands.size(); i++)
 	{
-		output << "###############################" << std::endl;
-		output << "############ K = " << system.K[i] << " ############" << std::endl;
-		output << "###############################" << std::endl << std::endl;
+		output << "###############################################" << std::endl;
+		output << "#################### K = " << system.K[i] << " ####################" << std::endl;
+		output << "###############################################" << std::endl << std::endl;
 
 		for (uint64_t j = 0; j < demands[i].size(); j++)
 		{
@@ -147,7 +151,7 @@ void Analytics::writeDemandsFile() const
 		output << std::endl;
 	}
 
-	output << "###############################";
+	output << "###############################################";
 
 	output.close();
 }
@@ -159,15 +163,16 @@ void Analytics::writeResultsFile(uint64_t n) const
 
 	for (uint64_t i = 0; i < demands.size(); i++)
 	{
-		output << "###############################" << std::endl;
-		output << "############ K = " << system.K[i] << " ############" << std::endl;
-		output << "###############################" << std::endl << std::endl;
+		output << "###############################################" << std::endl;
+		output << "#################### K = " << system.K[i] << " ####################" << std::endl;
+		output << "###############################################" << std::endl << std::endl;
 
 		output << std::left
 			   << std::setw(10) << "Server"
 			   << std::setw(10) << "U"
-			   << std::setw(10) << "X"
-			   << std::setw(10) << "Nsr";
+			   << std::setw(10) << "X [1/s]"
+			   << std::setw(10) << "Nsr"
+			   << std::setw(10) << "R [ms]";
 
 		output << std::endl;
 
@@ -177,19 +182,20 @@ void Analytics::writeResultsFile(uint64_t n) const
 				   << std::setw(10) << j
 				   << std::setw(10) << U[i][j]
 				   << std::setw(10) << X[i][j]
-				   << std::setw(10) << Nsr[i][j];
+				   << std::setw(10) << Nsr[i][j]
+				   << std::setw(10) << R[i][j];
 
 			output << std::endl;
 		}
 
 		output << std::endl;
 		
-		output << "T = " << T[i] << std::endl;
+		output << "T = " << T[i] << "s" << std::endl;
 		
 		output << std::endl;
 	}
 
-	output << "###############################";
+	output << "###############################################";
 
 	output.close();
 }
