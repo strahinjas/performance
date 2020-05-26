@@ -26,7 +26,7 @@ void Analytics::gordonNewell()
 
 		// solve M * X = 0
 
-		arma::mat R = null(M);
+		arma::mat R = arma::null(M);
 
 		// divide solutions by servers' service rates
 
